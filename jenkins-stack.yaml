@@ -134,6 +134,10 @@ Resources:
       IamInstanceProfile: !Ref JenkinsIamInstanceProfile
       KeyName: !Ref SSHKeyName
       SubnetId: !Ref PublicSubnet
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+              VolumeSize: '20'
       SecurityGroupIds:
         - Ref: JenkinsBoxSecGroup
       Tags:
