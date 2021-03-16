@@ -10,7 +10,7 @@ Parameters:
       - t3.large
   ImageId:
     Type: String
-    Default: ami-03622eef30c1f7dbf
+    Default: ami-0b7818d34e32a1c0a
   AccessCidr:
     Type: String
   SSHKeyName:
