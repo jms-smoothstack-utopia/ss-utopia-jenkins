@@ -75,3 +75,16 @@ Then open the Jenkins UI (on port 8080) to configure the instance with the usern
 Sonarqube will also need administrative configuration and can be accessed with the default `admin:admin` username and password (on port 9000).
 
 Once configured, a new AMI can be created from the configured settings and the [jenkins-stack.yaml](./jenkins-stack.yaml) template can be used with the new AMI ID.
+
+## Example Build
+Using the Blue Ocean UI, the full build pipeline can be clearly visualized. Each stage of the build can be inspected and log output for that individual stage can be reviewed for feedback for problems.
+
+An example of a passing build is seen here:
+![Passing Build](./media/example_passing_build.png)
+
+Should a build fail, we can inspect the specific stage for the specific causes for the failure:
+![Failing Build](./media/example_failing_build.png)
+
+## Sonarqube Results
+After the build has gone through the Sonarqube Quality Gates, we can visually inspect the output and address potential security hotspots, code smells, and review code coverage for specific files.
+![Sonarqube Example](./media/example_sonar.png)
