@@ -7,7 +7,7 @@ For credentials, please contact [Stephen Gerkin](mailto:stephen.gerkin@smoothsta
 The stack created for this instance is fully self-contained and provides its own VPC, Subnet, routing, and EC2 instance with CloudFormation. The template for this is available at [./jenkins-stack.yaml](./jenkins-stack.yaml). Not included in this repository are the parameters that provide SSH access to the EC2 instance. This can either be provided as a JSON file in `.secret/jenkins-params.json` to be run with the `create.ps1` script for creating a new CF stack, or provided during creation with the AWS CLI.
 
 The template design creates the following stack:
-![template design](./media/template1-designer.png)
+![template design](https://utopia-documentation-media.s3.amazonaws.com/jenkins/template1-designer.png)
 
 ## Creation
 The [create.ps1](./create.ps1) file contains the AWS CLI command for creating a new stack. The stack name for this is hardcoded in the script and meant only as a reference for intial creation. If additional copies of this stack should be created, use the following command (substituting as necessary) in a bash terminal:
@@ -55,10 +55,10 @@ The stack uses a custom AMI that includes all Utopia projects as pipeline projec
 
 ## Jenkins UI
 The Jenkins instance includes an install of the Blue Ocean UI for simpler pipeline management. Additional pipelines can be included by entering the Blue Ocean UI and clicking `New Pipeline`. From there, follow the prompts as appropriate and click `Create Pipeline`:
-![Blue Ocean New Pipeline](./media/blue-ocean.png)
+![Blue Ocean New Pipeline](https://utopia-documentation-media.s3.amazonaws.com/jenkins/blue-ocean.png)
 
 Additionally, a webhook must be created on GitHub to allow it to push changes to the repository with a payload URL of `http://ec2-52-90-241-158.compute-1.amazonaws.com:8080/github-webhook/`
-![GitHub webhook creation](./media/github-webhook.png)
+![GitHub webhook creation](https://utopia-documentation-media.s3.amazonaws.com/jenkins/github-webhook.png)
 
 ## Unconfigured Instance
 For a fresh, unconfigured instance with no credentials initialized (useful for creating a new AMI) can be created with the included [userdata-unconfigured.sh](./userdata-unconfigured.sh) file. This will create a new Jenkins and Sonarqube instance with no configuration.
@@ -80,11 +80,11 @@ Once configured, a new AMI can be created from the configured settings and the [
 Using the Blue Ocean UI, the full build pipeline can be clearly visualized. Each stage of the build can be inspected and log output for that individual stage can be reviewed for feedback for problems.
 
 An example of a passing build is seen here:
-![Passing Build](./media/example_passing_build.png)
+![Passing Build](https://utopia-documentation-media.s3.amazonaws.com/jenkins/example_passing_build.png)
 
 Should a build fail, we can inspect the specific stage for the specific causes for the failure:
-![Failing Build](./media/example_failing_build.png)
+![Failing Build](https://utopia-documentation-media.s3.amazonaws.com/jenkins/example_failing_build.png)
 
 ## Sonarqube Results
 After the build has gone through the Sonarqube Quality Gates, we can visually inspect the output and address potential security hotspots, code smells, and review code coverage for specific files.
-![Sonarqube Example](./media/example_sonar.png)
+![Sonarqube Example](https://utopia-documentation-media.s3.amazonaws.com/jenkins/example_sonar.png)
