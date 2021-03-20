@@ -88,3 +88,88 @@ Should a build fail, we can inspect the specific stage for the specific causes f
 ## Sonarqube Results
 After the build has gone through the Sonarqube Quality Gates, we can visually inspect the output and address potential security hotspots, code smells, and review code coverage for specific files.
 ![Sonarqube Example](https://utopia-documentation-media.s3.amazonaws.com/jenkins/example_sonar.png)
+
+## Example Jenkinsfile
+The following Jenkinsfile is an example of a full build for one of the backend services, specifically the Authentication Service. For the orignal source, please [visit the repository](https://github.com/jms-smoothstack-utopia/ss-utopia-auth).
+
+The pipeline accomplishes the following tasks:
+1. Checkout the code from GitHub
+2. Clean/Remove any existing binaries if present.
+3. Run the [Apache Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/) against the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html). Any violations will fail the pipeline.
+4. Run all unit tests and package the `.jar` files. Any test failures will fail the pipeline.
+5. Run static code analysis with the [SpotBugs Maven Plugin](https://spotbugs.github.io/) to find common coding mistakes. Any bugs found will fail the pipeline.
+6. Run static code analysis with [PMD Source Code Analyzer Maven Plugin](https://pmd.github.io/) to find additional mistakes not found by the previous step. Any bugs found will fail the pipeline.
+7. Run [Sonarqube Code Analysis](https://www.sonarqube.org/) to find bugs, code smells, security hotspots, and test code coverage.
+8. Await the results of a Sonarqube Quality Gate. The quality gate is the default "Sonar way" and consists of the following checks:
+![Quality Gate controls](https://utopia-documentation-media.s3.amazonaws.com/jenkins/quality-gate.png)
+Any error returned from the quality gate will fail the pipeline.
+9. Build the project into a Docker image. Failure to build will result in a pipeline failure.
+10. If on the main branch, the built Docker image will be pushed to AWS ECR for deployment.
+
+Finally, once the pipeline is complete (regardless of failure or success), all built items will be cleaned from the system to prevent clutter and save on storage costs.
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Clean target') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+        stage('Lint') {
+            steps {
+                sh 'mvn checkstyle:check'
+            }
+        }
+        stage('Test and Package') {
+            steps {
+                sh 'mvn test package'
+            }
+        }
+        stage('Code Analysis: SpotBugs') {
+            steps {
+                sh 'mvn spotbugs:check'
+            }
+        }
+        stage('Code Analysis: PMD') {
+            steps {
+                sh 'mvn pmd:check'
+            }
+        }
+        stage('Code Analysis: Sonarqube') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+        stage('Await Quality Gateway') {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+        stage('Build Docker image') {
+            steps {
+                sh 'mvn docker:build'
+            }
+        }
+        stage('Push image to repository') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 247293358719.dkr.ecr.us-east-1.amazonaws.com'
+                sh 'mvn docker:push'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'mvn clean -Ddocker.removeMode=all docker:remove'
+            sh 'docker system prune -f'
+        }
+    }
+}
+
+```
