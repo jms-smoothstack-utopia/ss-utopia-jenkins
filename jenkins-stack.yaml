@@ -120,6 +120,18 @@ Resources:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:PutImage
                 Resource: '*'
+        - PolicyName: uploads3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - arn:aws:s3:::utopia-air.click
+                  - arn:aws:s3:::utopia-air.click/*
+                  - arn:aws:s3:::dev.utopia-air.click
+                  - arn:aws:s3:::dev.utopia-air.click/*
   JenkinsIamInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
